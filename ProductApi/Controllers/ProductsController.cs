@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductApi.Models;
 using ProductApi.Services;
+using ProductApi.DTOs;
 
 namespace ProductApi.Controllers;
 [ApiController]
@@ -25,12 +26,15 @@ public class ProductsController:ControllerBase{
     }
 
     [HttpPost]
-    public IActionResult Add(Product product){
-            if(product ==null){
-                return BadRequest("product is required.");
-            }
-                           var result =_productservice.Add(product);
-                           var result2=_productservice.GetAll();
-            return Ok(result2);
+    public IActionResult Add(ProductCreateDto dto){
+            Product product = new()
+            {
+                Id=_productservice.GetAll().Count,
+                Name=dto.Name,
+                Price=dto.Price,
+                Stock=dto.Stock
+            };
+            var createdproduct =_productservice.Add(product);
+            return CreatedAtAction(nameof(GetById),new{Id=createdproduct.Id},createdproduct);
     }
 }
