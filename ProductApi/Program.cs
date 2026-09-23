@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductApi.Data;
+using ProductApi.Middlewares;
 using ProductApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +14,11 @@ builder.Services.AddDbContext<AppDbContext>(options=>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IProductService,ProductService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>(); // here we register the exception handler
 var app = builder.Build();
-
+// configura the middleware 
+app.UseExceptionHandler(options=>{ });
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
