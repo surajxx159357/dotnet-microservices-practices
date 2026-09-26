@@ -58,7 +58,9 @@ public class ProductService:IProductService
         // _context.Products.Update(product);
         // await _context.SaveChangesAsync();
         var product=await _context.Products.FirstOrDefaultAsync(x=>x.Id==Id);
-        if(product==null)return null;
+        if(product==null){
+            _logger.LogError("Product is Not Found for updation.");
+            return null;}
         product.Name=productUpdateDto.Name;
         product.Price=productUpdateDto.Price;
         product.Stock=productUpdateDto.Stock;
@@ -70,6 +72,9 @@ public class ProductService:IProductService
     {
         bool isDeleted=false;
         var product=await this.GetByIdAsync(Id);
+        if(product==null){
+            _logger.LogInformation("No product is found against this id for deletion.");
+        }
          _context.Products.Remove(product);
          isDeleted=await _context.SaveChangesAsync()>0;
          return isDeleted;

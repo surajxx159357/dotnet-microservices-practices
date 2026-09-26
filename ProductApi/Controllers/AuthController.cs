@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using ProductApi.Models;
 using ProductApi.DTOs;
 using ProductApi.Services;
+using ProductApi.Dtos;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IUserService _userservice;
-    public UsersController(IUserService userService)
+    public AuthController(IUserService userService)
     {
         _userservice=userService;
     }
@@ -25,15 +26,12 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
     [HttpPost]
-    public async Task<IActionResult> Add(UserCreateDto usr)
+    public async Task<IActionResult> Add(RegisterDto usr)
     {
-        User user = new()
-        {
-            Name=usr.Name,
-            Role=usr.Role,
-            Email=usr.Email
-        };
-        var createduser=await _userservice.AddAsync(user);
-        return CreatedAtAction(nameof(GetById),new {Id=createduser.Id},user);
+        var createduser=await _userservice.AddAsync(usr);
+        if(createduser ==null){
+            return BadRequest("User already exists.");
+        }
+        return CreatedAtAction(nameof(GetById),new {Id=createduser.Id},usr);
     }
 }
